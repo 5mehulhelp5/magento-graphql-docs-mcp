@@ -160,6 +160,16 @@ Example VS Code MCP config using the Docker wrapper:
 
 After adding the server entry, open the VS Code MCP/Tools panel and press “Start” for `magento-webapi-docs` to launch the container-backed STDIO server.
 
+### Docker Compose (HTTP/SSE)
+
+Use the provided `docker-compose.yml` to run the server on HTTP/SSE:
+
+```bash
+docker compose up --build
+```
+
+This builds from `docker/Dockerfile`, maps `8765:8765`, and sets `MAGENTO_GRAPHQL_DOCS_TRANSPORT=http` with `MAGENTO_GRAPHQL_DOCS_HOST=0.0.0.0`. Uncomment the `volumes` block in `docker-compose.yml` to bind a local docs checkout; otherwise the image can auto-fetch the docs. Port 8765 is chosen to avoid common 8080 conflicts; adjust as needed.
+
 ### Step 5: Run and Verify
 
 ```bash
@@ -249,6 +259,19 @@ magento-graphql-docs-mcp
 
 On subsequent runs, if the documentation hasn't changed, startup is nearly instant (~0.87s).
 
+### Running Over HTTP/SSE
+
+STDIO remains the default. To expose the server via HTTP with SSE (for clients that expect MCP over SSE), set the transport variables:
+
+```bash
+MAGENTO_GRAPHQL_DOCS_TRANSPORT=http \
+MAGENTO_GRAPHQL_DOCS_HOST=0.0.0.0 \
+MAGENTO_GRAPHQL_DOCS_PORT=8765 \
+magento-graphql-docs-mcp
+```
+
+`MAGENTO_GRAPHQL_DOCS_HOST` defaults to `127.0.0.1` and `MAGENTO_GRAPHQL_DOCS_PORT` defaults to `8000` when unset. Port 8080 is frequently used by other services; pick any free port (example above uses 8765).
+
 ### Configuration
 
 The server uses environment variables for configuration:
@@ -298,6 +321,16 @@ export MAGENTO_GRAPHQL_DOCS_MAX_FIELDS=30
 # Max code preview length in characters (default: 400)
 export MAGENTO_GRAPHQL_DOCS_CODE_PREVIEW=600
 ```
+
+#### Transport & Port
+
+Control how the MCP server is exposed:
+
+- `MAGENTO_GRAPHQL_DOCS_TRANSPORT`: `stdio` (default) or `http`/`sse` to enable HTTP + SSE
+- `MAGENTO_GRAPHQL_DOCS_HOST`: bind address for HTTP/SSE mode (default: `127.0.0.1`)
+- `MAGENTO_GRAPHQL_DOCS_PORT`: HTTP/SSE port (default: `8000`)
+
+FastMCP serves SSE when `transport="http"`.
 
 ### Using with an MCP Client
 

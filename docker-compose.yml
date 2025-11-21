@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  magento-graphql-docs-mcp:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    environment:
+      - MAGENTO_GRAPHQL_DOCS_TRANSPORT=http
+      - MAGENTO_GRAPHQL_DOCS_HOST=0.0.0.0
+      - MAGENTO_GRAPHQL_DOCS_PORT=8765
+      - MAGENTO_GRAPHQL_DOCS_AUTO_FETCH=true
+      #- MAGENTO_GRAPHQL_DOCS_AUTO_FETCH=false
+    ports:
+      - "8765:8765"
+    # Uncomment to mount a local docs checkout instead of auto-fetching:
+    # volumes:
+    #   - ./data:/data:ro

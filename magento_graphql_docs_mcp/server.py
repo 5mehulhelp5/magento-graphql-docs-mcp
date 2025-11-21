@@ -8,6 +8,7 @@ from .config import DB_PATH, DB_TOP_K, MAX_CODE_PREVIEW_LENGTH, SEARCH_RESULT_MU
 from typing import Annotated
 import json
 import logging
+import os
 import sys
 
 logging.basicConfig(level=logging.INFO)
@@ -496,8 +497,38 @@ def get_related_documents(
     return "\n".join(lines)
 
 
+def _get_transport_settings() -> tuple[str, str, int]:
+    """
+    Determine how the server should be exposed.
+    Default: stdio. Set MAGENTO_GRAPHQL_DOCS_TRANSPORT=http (or sse) to enable SSE.
+    """
+    transport = os.environ.get("MAGENTO_GRAPHQL_DOCS_TRANSPORT", "stdio").strip().lower() or "stdio"
+    host = os.environ.get("MAGENTO_GRAPHQL_DOCS_HOST", "127.0.0.1")
+    port_raw = os.environ.get("MAGENTO_GRAPHQL_DOCS_PORT", "8765")
+
+    if transport not in {"stdio", "http", "sse"}:
+        logger.warning("Unknown transport '%s'; falling back to stdio", transport)
+        transport = "stdio"
+
+    try:
+        port = int(port_raw)
+    except ValueError:
+        logger.warning("Invalid MAGENTO_GRAPHQL_DOCS_PORT '%s'; falling back to 8765", port_raw)
+        port = 8765
+
+    return transport, host, port
+
+
 def main():
-    mcp.run()
+    transport, host, port = _get_transport_settings()
+
+    if transport == "stdio":
+        mcp.run()
+        return
+
+    # FastMCP serves SSE when transport="http"
+    logger.info("Starting HTTP/SSE server (transport=%s) on %s:%s", transport, host, port)
+    mcp.run(transport="http", host=host, port=port)
 
 
 if __name__ == "__main__":
