@@ -270,7 +270,7 @@ MAGENTO_GRAPHQL_DOCS_PORT=8765 \
 magento-graphql-docs-mcp
 ```
 
-`MAGENTO_GRAPHQL_DOCS_HOST` defaults to `127.0.0.1` and `MAGENTO_GRAPHQL_DOCS_PORT` defaults to `8000` when unset. Port 8080 is frequently used by other services; pick any free port (example above uses 8765).
+`MAGENTO_GRAPHQL_DOCS_HOST` defaults to `127.0.0.1` and `MAGENTO_GRAPHQL_DOCS_PORT` defaults to `8765` when unset. Port 8765 is frequently used by other services; pick any free port (example above uses the default port 8765).
 
 ### Configuration
 
@@ -328,7 +328,7 @@ Control how the MCP server is exposed:
 
 - `MAGENTO_GRAPHQL_DOCS_TRANSPORT`: `stdio` (default) or `http`/`sse` to enable HTTP + SSE
 - `MAGENTO_GRAPHQL_DOCS_HOST`: bind address for HTTP/SSE mode (default: `127.0.0.1`)
-- `MAGENTO_GRAPHQL_DOCS_PORT`: HTTP/SSE port (default: `8000`)
+- `MAGENTO_GRAPHQL_DOCS_PORT`: HTTP/SSE port (default: `8765`)
 
 FastMCP serves SSE when `transport="http"`.
 
